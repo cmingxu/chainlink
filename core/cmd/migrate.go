@@ -288,15 +288,33 @@ func BuildTaskDAG(js models.JobSpec, tpe job.Type) (string, *pipeline.Pipeline, 
 			foundEthTx = true
 		default:
 			// assume it's a bridge task
+
+			attrs1 := map[string]string{
+				"type":  "merge",
+				"right": "(uint256 value)",
+				//"data": <{ "value": $(multiply) }>,
+			}
+			n = pipeline.NewGraphNode(dg.NewNode(), fmt.Sprintf("encode_data_%d", i), attrs1)
+			dg.AddNode(n)
+			if last != nil {
+				dg.SetEdge(dg.NewEdge(last, n))
+			}
+			last = n
+
 			encodedValue, err := encodeTemplate(ts.Params.Bytes())
 			if err != nil {
 				return "", nil, err
 			}
 			template := fmt.Sprintf("%%REQ_DATA_%v%%", i)
-			attrs := map[string]string{
+
+			reqData := map[string]string{
+				"data": template,
+			}
+
+			attrs := map[string]interface{}{
 				"type":        pipeline.TaskTypeBridge.String(),
 				"name":        ts.Type.String(),
-				"requestData": template,
+				"requestData": reqData,
 			}
 			replacements["\""+template+"\""] = encodedValue
 

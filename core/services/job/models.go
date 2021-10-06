@@ -108,11 +108,11 @@ type JobDirectRequestFlat struct {
 	ExternalJobID            uuid.UUID           `toml:"externalJobID"`
 	ContractAddress          ethkey.EIP55Address `toml:"contractAddress"`
 	MinIncomingConfirmations clnull.Uint32       `toml:"minIncomingConfirmations"`
+	Requesters               []string            `toml:"requesters"`
 	Type                     Type
 	SchemaVersion            uint32
 	Name                     null.String
-	ObservationSource        string   `toml:"observationSource" multiline:"true"`
-	Requesters               []string `toml:"requesters"`
+	ObservationSource        string `toml:"observationSource" multiline:"true"`
 }
 
 // The external job ID (UUID) can be encoded into a log topic (32 bytes)
