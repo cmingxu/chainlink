@@ -85,6 +85,8 @@ func (h *Head) HashAtHeight(blockNum int64) common.Hash {
 	return common.Hash{}
 }
 
+const sanityLimit = 100000
+
 // ChainLength returns the length of the chain followed by recursively looking up parents
 func (h *Head) ChainLength() uint32 {
 	l := uint32(1)
@@ -95,6 +97,9 @@ func (h *Head) ChainLength() uint32 {
 			h = h.Parent
 		} else {
 			break
+		}
+		if l > sanityLimit {
+			panic("probable infinite loop detected, recursive lookup exceeded sanity limit")
 		}
 	}
 	return l
@@ -115,9 +120,9 @@ func (h *Head) ChainHashes() []common.Hash {
 	return hashes
 }
 
-// String returns a string representation of this number.
+// String returns a string representation of this head
 func (h *Head) String() string {
-	return h.ToInt().String()
+	return fmt.Sprintf("*eth.Head{Number: %d, Hash: %s, ParentHash: %s}", h.ToInt(), h.Hash.Hex(), h.ParentHash.Hex())
 }
 
 // ToInt return the height as a *big.Int. Also handles nil by returning nil.

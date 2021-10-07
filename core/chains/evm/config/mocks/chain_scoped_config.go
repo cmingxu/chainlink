@@ -2291,6 +2291,20 @@ func (_m *ChainScopedConfig) KeeperRegistrySyncInterval() time.Duration {
 	return r0
 }
 
+// KeeperRegistrySyncUpkeepQueueSize provides a mock function with given fields:
+func (_m *ChainScopedConfig) KeeperRegistrySyncUpkeepQueueSize() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 // KeyFile provides a mock function with given fields:
 func (_m *ChainScopedConfig) KeyFile() string {
 	ret := _m.Called()
