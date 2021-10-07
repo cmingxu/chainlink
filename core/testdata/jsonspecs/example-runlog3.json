@@ -7,8 +7,7 @@
   ],
   "tasks": [
     {
-      "type": "bridge",
-      "name": "my_bridge",
+      "type": "my_bridge",
       "params": { "foo": "bar" }
     },
     {

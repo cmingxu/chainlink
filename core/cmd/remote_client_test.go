@@ -873,7 +873,7 @@ decode_log [
 	];
 	send_to_bridge_1 [
 	name=qdt
-	requestData=<{"data":"$(merge_1)"}>
+	requestData=<{ "data": $(merge_1) }>
 	type=bridge
 	];
 	multiply_1 [

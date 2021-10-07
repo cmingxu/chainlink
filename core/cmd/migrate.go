@@ -308,20 +308,6 @@ func BuildTaskDAG(js models.JobSpec, tpe job.Type) (string, *pipeline.Pipeline, 
 				dg.SetEdge(dg.NewEdge(last, n))
 			}
 			last = n
-
-			reqData := map[string]string{
-				"data": fmt.Sprintf("$(%v)", last.DOTID()),
-			}
-
-			marshal, err := json.Marshal(&reqData)
-			if err != nil {
-				return "", nil, err
-			}
-
-			encodedValue, err := encodeTemplate(marshal)
-			if err != nil {
-				return "", nil, err
-			}
 			template := fmt.Sprintf("%%REQ_DATA_%v%%", i)
 
 			attrs := map[string]string{
@@ -329,12 +315,11 @@ func BuildTaskDAG(js models.JobSpec, tpe job.Type) (string, *pipeline.Pipeline, 
 				"name":        ts.Type.String(),
 				"requestData": template,
 			}
-			replacements["\""+template+"\""] = encodedValue
+			replacements["\""+template+"\""] = fmt.Sprintf("{ \"data\": $(%v) }", last.DOTID())
 
 			n = pipeline.NewGraphNode(dg.NewNode(), fmt.Sprintf("send_to_bridge_%d", i), attrs)
 			i++
 		}
-
 		if n != nil {
 			dg.AddNode(n)
 			if last != nil {
