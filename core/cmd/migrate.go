@@ -289,32 +289,45 @@ func BuildTaskDAG(js models.JobSpec, tpe job.Type) (string, *pipeline.Pipeline, 
 		default:
 			// assume it's a bridge task
 
+			encodedValue1, err := encodeTemplate(ts.Params.Bytes())
+			if err != nil {
+				return "", nil, err
+			}
+			template1 := fmt.Sprintf("%%REQ_DATA_%v%%", i)
+			i++
+			replacements["\""+template1+"\""] = encodedValue1
+
 			attrs1 := map[string]string{
 				"type":  "merge",
-				"right": "(uint256 value)",
+				"right": template1,
 				//"data": <{ "value": $(multiply) }>,
 			}
-			n = pipeline.NewGraphNode(dg.NewNode(), fmt.Sprintf("encode_data_%d", i), attrs1)
+			n = pipeline.NewGraphNode(dg.NewNode(), fmt.Sprintf("merge_%d", i), attrs1)
 			dg.AddNode(n)
 			if last != nil {
 				dg.SetEdge(dg.NewEdge(last, n))
 			}
 			last = n
 
-			encodedValue, err := encodeTemplate(ts.Params.Bytes())
+			reqData := map[string]string{
+				"data": fmt.Sprintf("$(%v)", last.DOTID()),
+			}
+
+			marshal, err := json.Marshal(&reqData)
+			if err != nil {
+				return "", nil, err
+			}
+
+			encodedValue, err := encodeTemplate(marshal)
 			if err != nil {
 				return "", nil, err
 			}
 			template := fmt.Sprintf("%%REQ_DATA_%v%%", i)
 
-			reqData := map[string]string{
-				"data": template,
-			}
-
-			attrs := map[string]interface{}{
+			attrs := map[string]string{
 				"type":        pipeline.TaskTypeBridge.String(),
 				"name":        ts.Type.String(),
-				"requestData": reqData,
+				"requestData": template,
 			}
 			replacements["\""+template+"\""] = encodedValue
 
