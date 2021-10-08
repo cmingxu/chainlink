@@ -366,7 +366,6 @@ func (ht *HeadTracker) handleNewHead(ctx context.Context, head eth.Head) error {
 
 		headWithChain := ht.headSaver.Chain(head.Hash)
 		if headWithChain == nil {
-			panic("fuck")
 			return errors.Errorf("HeadTracker#handleNewHighestHead headWithChain was unexpectedly nil")
 		}
 
